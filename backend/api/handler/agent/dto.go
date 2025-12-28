@@ -20,6 +20,14 @@ type CreateAgentResponse struct {
 	ID string `json:"id"`
 }
 
+type UpdateAgentRequest struct {
+	Name        string              `json:"name"`
+	Type        domain.AgentType    `json:"type"`
+	Description string              `json:"description"`
+	Config      domain.AgentConfig  `json:"config"`
+	Profile     domain.AgentProfile `json:"profile"`
+}
+
 type ChatRequest struct {
 	AgentID string `json:"agent_id" binding:"required"`
 	Message string `json:"message" binding:"required"`

@@ -1,16 +1,19 @@
-Name: omniread-backend-test
+Name: omniread-backend
 Log:
   Mode: console
   Level: debug
-ListenOn: 0.0.0.0:8088
+ListenOn: 0.0.0.0:8080
 State: dev
 Auth:
-  SecretKey: "secret_test"
-  PublicKey: "public"
-  AccessExpire: 3600
+  SecretKey: "YOUR_SECRET_KEY"
+  PublicKey: "YOUR_PUBLIC_KEY"
+  AccessExpire: 86400
+WeApp:
+  AppID: "YOUR_APP_ID"
+  AppSecret: "YOUR_APP_SECRET"
 Mongo:
   URL: "mongodb://localhost:27018"
-  DB: "omniread_test"
+  DB: "omniread"
 Cache:
   - Host: "localhost:6376"
     Pass: "123456"
@@ -18,12 +21,15 @@ Redis:
   Host: "localhost:6376"
   Pass: "123456"
   Type: node
-WeApp:
-  AppID: "mock_id"
-  AppSecret: "mock_secret"
 OSS:
   Endpoint: "127.0.0.1:9000"
   AccessKeyID: "minioadmin"
   SecretAccessKey: "minioadmin"
-  BucketName: "omniread-books-test"
+  BucketName: "omniread-books"
   UseSSL: false
+Bocha:
+  APIKey: "sk-7c58260b147c4226b3dfbd8167104280"
+Model:
+  BaseURL: "https://chat.ecnu.edu.cn/open/api/v1"
+  ApiKey: "sk-f194703e3bdc43178027914e83093beb"
+  Model: "ecnu-max"

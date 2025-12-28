@@ -67,6 +67,7 @@ func SetupRoutes() *gin.Engine {
 		agents := apiV1.Group("/agents")
 		{
 			agents.POST("", agentHdl.Create)
+			agents.PUT("/:id", agentHdl.Update)
 			agents.POST("/chat", agentHdl.Chat)
 		}
 	}

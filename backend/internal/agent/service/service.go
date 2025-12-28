@@ -31,6 +31,14 @@ func (s *AgentService) CreateAgent(ctx context.Context, agent *domain.Agent) err
 	return s.repo.Create(ctx, agent)
 }
 
+func (s *AgentService) UpdateAgent(ctx context.Context, agent *domain.Agent) error {
+	if agent.ID == "" {
+		return errors.New("agent id is required")
+	}
+	agent.UpdatedAt = time.Now().Unix()
+	return s.repo.Update(ctx, agent)
+}
+
 func (s *AgentService) GetAgent(ctx context.Context, id string) (*domain.Agent, error) {
 	return s.repo.FindByID(ctx, id)
 }

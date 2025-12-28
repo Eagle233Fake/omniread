@@ -105,8 +105,15 @@ func (s *BookService) UpdateBook(ctx context.Context, userID, bookID string, req
 	}
 
 	// Permission Check: only owner can update (add admin check later if needed)
-	if book.UploadBy.Hex() != userID {
-		return errorx.New(403, "permission denied")
+	// Allow update if UploadBy is zero (legacy/migration support)
+	if !book.UploadBy.IsZero() && book.UploadBy.Hex() != userID {
+		return errorx.New(403)
+	}
+
+	// If it was a legacy book, take ownership
+	if book.UploadBy.IsZero() {
+		uid, _ := primitive.ObjectIDFromHex(userID)
+		book.UploadBy = uid
 	}
 
 	if req.Title != "" {

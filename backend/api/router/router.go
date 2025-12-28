@@ -27,12 +27,8 @@ func SetupRoutes() *gin.Engine {
 	r.Static("/uploads", "./uploads")
 
 	// Protected routes
-	// TODO: Add Auth Middleware here
-	// For now, assuming middleware sets "uid"
 	api := r.Group("/")
-	// api.Use(middleware.Auth())
-	// NOTE: Middleware should be applied here for protected routes.
-	// Assuming it's already there or handled globally for now based on previous context
+	api.Use(middleware.Auth())
 
 	userGroup := api.Group("/user")
 	{

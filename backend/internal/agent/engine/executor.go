@@ -89,20 +89,8 @@ func (e *AgentExecutor) ChatStream(ctx context.Context, agent *domain.Agent, use
 		return nil, fmt.Errorf("failed to init chat model: %w", err)
 	}
 
-	// 5. 定义 Graph (Chain)
-	// 使用 ToolsNode 来支持工具调用
-	// 流程： Input -> ToolsNode (LLM + Tools) -> Output
-	chain := compose.NewChain[[]*schema.Message, *schema.Message]()
-
+	// 绑定工具到 ChatModel
 	if len(agentTools) > 0 {
-		// 如果有工具，使用 ToolsNode
-		toolsNode, err := compose.NewToolNode(ctx, &compose.ToolsNodeConfig{
-			Tools: agentTools,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to create tools node: %w", err)
-		}
-		// 提取 ToolInfo 用于绑定到 ChatModel
 		toolInfos := make([]*schema.ToolInfo, 0, len(agentTools))
 		for _, t := range agentTools {
 			info, err := t.Info(ctx)
@@ -112,51 +100,99 @@ func (e *AgentExecutor) ChatStream(ctx context.Context, agent *domain.Agent, use
 			toolInfos = append(toolInfos, info)
 		}
 
-		// 正确绑定工具到 ChatModel
 		if err := chatModel.BindTools(toolInfos); err != nil {
 			return nil, fmt.Errorf("failed to bind tools to chat model: %w", err)
 		}
-
-		chain.AppendChatModel(chatModel)
-		chain.AppendToolsNode(toolsNode)
-	} else {
-		// 无工具，直接连接 ChatModel
-		chain.AppendChatModel(chatModel)
 	}
 
-	// 编译 Graph
-	runner, err := chain.Compile(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to compile chain: %w", err)
-	}
-
-	// 6. 构造输入消息 (System + History + User)
+	// 构造输入消息 (System + History + User)
 	input := make([]*schema.Message, 0, len(history)+2)
 	input = append(input, schema.SystemMessage(sysPrompt))
 	input = append(input, history...)
 	input = append(input, schema.UserMessage(userMessage))
 
-	// 7. 执行并获取流
-	stream, err := runner.Stream(ctx, input)
-	if err != nil {
-		return nil, fmt.Errorf("failed to stream: %w", err)
+	// 5. 执行逻辑 (ReAct Pattern)
+	// 如果没有工具，直接流式返回
+	if len(agentTools) == 0 {
+		stream, err := chatModel.Stream(ctx, input)
+		if err != nil {
+			return nil, fmt.Errorf("failed to stream: %w", err)
+		}
+		return e.wrapStream(stream, sessionID, userMessage), nil
 	}
 
-	// 8. 异步保存用户消息到历史 (System Prompt 不保存)
+	// 如果有工具，先尝试 Generate 探测意图
+	resp, err := chatModel.Generate(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate: %w", err)
+	}
+
+	// 检查是否有工具调用
+	if len(resp.ToolCalls) > 0 {
+		// 创建 ToolsNode
+		toolsNode, err := compose.NewToolNode(ctx, &compose.ToolsNodeConfig{
+			Tools: agentTools,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create tools node: %w", err)
+		}
+
+		// 执行工具
+		toolOutputs, err := toolsNode.Invoke(ctx, resp)
+		if err != nil {
+			return nil, fmt.Errorf("failed to invoke tools: %w", err)
+		}
+
+		// 追加历史
+		input = append(input, resp)
+		input = append(input, toolOutputs...)
+
+		// 第二轮流式调用
+		stream, err := chatModel.Stream(ctx, input)
+		if err != nil {
+			return nil, fmt.Errorf("failed to stream final response: %w", err)
+		}
+		return e.wrapStream(stream, sessionID, userMessage), nil
+	}
+
+	// 无工具调用，直接返回 Generate 的结果
+	return e.wrapStream(&memoryStream{content: resp.Content}, sessionID, userMessage), nil
+}
+
+func (e *AgentExecutor) wrapStream(inner Stream, sessionID, userMessage string) Stream {
+	// 异步保存用户消息到历史 (System Prompt 不保存)
 	go func() {
 		bgCtx := context.Background()
 		_ = e.historyManager.AddMessage(bgCtx, sessionID, schema.UserMessage(userMessage))
 	}()
 
 	return &historyStreamReader{
-		reader:         stream,
+		reader:         inner,
 		historyManager: e.historyManager,
 		sessionID:      sessionID,
+	}
+}
+
+type memoryStream struct {
+	content string
+	sent    bool
+}
+
+func (s *memoryStream) Recv() (*schema.Message, error) {
+	if s.sent {
+		return nil, io.EOF
+	}
+	s.sent = true
+	return &schema.Message{
+		Role:    "assistant",
+		Content: s.content,
 	}, nil
 }
 
+func (s *memoryStream) Close() {}
+
 type historyStreamReader struct {
-	reader         *schema.StreamReader[*schema.Message]
+	reader         Stream
 	historyManager *memory.RedisHistoryManager
 	sessionID      string
 	sb             strings.Builder

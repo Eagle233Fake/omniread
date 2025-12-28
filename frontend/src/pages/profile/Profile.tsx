@@ -21,7 +21,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import api from '../../api/client';
 
 const Profile: React.FC = () => {
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const [tab, setTab] = useState(0);
   const [msg, setMsg] = useState({ type: '', text: '' });
   
@@ -147,42 +147,42 @@ const Profile: React.FC = () => {
           {tab === 0 && (
             <form onSubmit={handleProfileSubmit}>
               <Grid container spacing={3}>
-                <Grid item xs={12} display="flex" justifyContent="center">
+                <Grid size={12} display="flex" justifyContent="center">
                   <Avatar 
                     sx={{ width: 100, height: 100, fontSize: 40 }}
                   >
                     {profile.nickname?.[0]?.toUpperCase()}
                   </Avatar>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField 
                     fullWidth label="Nickname / Username" 
                     value={profile.nickname}
                     onChange={e => setProfile({...profile, nickname: e.target.value})}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField 
                     fullWidth label="Email" 
                     value={profile.email}
                     onChange={e => setProfile({...profile, email: e.target.value})}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField 
                     fullWidth label="Phone" 
                     value={profile.phone}
                     onChange={e => setProfile({...profile, phone: e.target.value})}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField 
                     fullWidth multiline rows={3} label="Bio" 
                     value={profile.bio}
                     onChange={e => setProfile({...profile, bio: e.target.value})}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Button variant="contained" type="submit" disabled={updateProfileMutation.isPending}>
                     Save Changes
                   </Button>
@@ -194,28 +194,28 @@ const Profile: React.FC = () => {
           {tab === 1 && (
             <form onSubmit={handlePasswordSubmit}>
               <Grid container spacing={3} maxWidth="sm">
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField 
                     fullWidth type="password" label="Current Password" 
                     value={password.old}
                     onChange={e => setPassword({...password, old: e.target.value})}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField 
                     fullWidth type="password" label="New Password" 
                     value={password.new}
                     onChange={e => setPassword({...password, new: e.target.value})}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField 
                     fullWidth type="password" label="Confirm New Password" 
                     value={password.confirm}
                     onChange={e => setPassword({...password, confirm: e.target.value})}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Button variant="contained" type="submit" color="error" disabled={changePasswordMutation.isPending}>
                     Change Password
                   </Button>
@@ -227,7 +227,7 @@ const Profile: React.FC = () => {
           {tab === 2 && (
             <form onSubmit={handlePreferencesSubmit}>
               <Grid container spacing={3} maxWidth="sm">
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <FormControl fullWidth>
                     <InputLabel>Reading Font</InputLabel>
                     <Select
@@ -243,7 +243,7 @@ const Profile: React.FC = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <TextField 
                     fullWidth type="number" label="Base Font Size (%)" 
                     value={preferences.font_size}
@@ -251,7 +251,7 @@ const Profile: React.FC = () => {
                     helperText="Default size percentage for reader (e.g. 100)"
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Button variant="contained" type="submit" disabled={updatePreferencesMutation.isPending}>
                     Save Preferences
                   </Button>

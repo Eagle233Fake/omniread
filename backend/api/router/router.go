@@ -62,7 +62,7 @@ func SetupRoutes() *gin.Engine {
 
 	agentHdl := agent.NewAgentHandler(provider.Get().AgentService)
 
-	apiV1 := r.Group("/api/v1")
+	apiV1 := r.Group("/v1")
 	{
 		agents := apiV1.Group("/agents")
 		{

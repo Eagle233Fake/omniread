@@ -28,8 +28,10 @@ import { useAuth } from '../context/AuthContext';
 
 import { 
   MenuOpen as MenuOpenIcon,
-  ChevronLeft as ChevronLeftIcon
+  ChevronLeft as ChevronLeftIcon,
+  SmartToy as BotIcon
 } from '@mui/icons-material';
+import AgentChatSidebar from '../components/AgentChat/AgentChatSidebar';
 
 const drawerWidth = 240;
 const railWidth = 80;
@@ -44,6 +46,7 @@ const Layout: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(false); // New state for desktop drawer
+  const [agentChatOpen, setAgentChatOpen] = useState(false);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -187,6 +190,14 @@ const Layout: React.FC = () => {
           <Box>
             <IconButton
               size="large"
+              color="inherit"
+              onClick={() => setAgentChatOpen(true)}
+              sx={{ mr: 1 }}
+            >
+              <BotIcon />
+            </IconButton>
+            <IconButton
+              size="large"
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
@@ -287,6 +298,8 @@ const Layout: React.FC = () => {
       >
         <Outlet />
       </Box>
+
+      <AgentChatSidebar open={agentChatOpen} onClose={() => setAgentChatOpen(false)} />
     </Box>
   );
 };

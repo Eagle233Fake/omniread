@@ -63,21 +63,21 @@ const Insight: React.FC = () => {
       <Typography variant="h4" sx={{ mb: 4 }}>Reading Insights</Typography>
       
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <StatCard 
             title="Total Reading Time" 
             value={Math.round(safeSummary.total_reading_time / 3600)} 
             unit="Hours" 
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <StatCard 
             title="Books Completed" 
             value={safeSummary.total_books_read} 
             unit="Books" 
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <StatCard 
             title="Current Streak" 
             value={safeSummary.current_streak} 

@@ -58,8 +58,10 @@ const Library: React.FC = () => {
     queryKey: ['books'],
     queryFn: async () => {
       const res: any = await api.get('/books');
-      return res.data || [];
-    }
+      return res?.data || [];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false
   });
 
   const uploadMutation = useMutation({
@@ -160,14 +162,14 @@ const Library: React.FC = () => {
       ) : (
         <Grid container spacing={3}>
           {books?.length === 0 && (
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Typography variant="body1" align="center" sx={{ width: '100%', mt: 4, color: 'text.secondary' }}>
                 No books found in your library.
               </Typography>
             </Grid>
           )}
           {books?.map((book) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={book.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={book.id}>
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardActionArea 
                   onClick={() => navigate(`/read/${book.id}`)}

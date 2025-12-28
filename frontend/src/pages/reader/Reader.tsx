@@ -9,20 +9,21 @@ import {
   Slider, 
   Menu, 
   MenuItem,
-  CircularProgress,
-  Fab
+  CircularProgress
 } from '@mui/material';
 import { 
   ArrowBack as ArrowBackIcon, 
   Settings as SettingsIcon,
   NavigateBefore as PrevIcon,
-  NavigateNext as NextIcon
+  NavigateNext as NextIcon,
+  SmartToy as BotIcon
 } from '@mui/icons-material';
 import { ReactReader } from 'react-reader';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/client';
 import useDebounce from '../../utils/useDebounce';
+import AgentChatSidebar from '../../components/AgentChat/AgentChatSidebar';
 
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -45,6 +46,7 @@ const Reader: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   
   const [fontFamily, setFontFamily] = useState('Roboto');
 
@@ -53,7 +55,7 @@ const Reader: React.FC = () => {
     queryKey: ['book', id],
     queryFn: async () => {
       const res: any = await api.get(`/books/${id}`);
-      return res.data;
+      return res?.data;
     },
     enabled: !!id
   });
@@ -164,6 +166,9 @@ const Reader: React.FC = () => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {book?.title}
           </Typography>
+          <IconButton color="inherit" onClick={() => setIsChatOpen(true)} sx={{ mr: 1 }}>
+            <BotIcon />
+          </IconButton>
           <IconButton color="inherit" onClick={handleSettingsOpen}>
             <SettingsIcon />
           </IconButton>
@@ -189,6 +194,7 @@ const Reader: React.FC = () => {
 
       {/* Reader Content */}
       <Box sx={{ flexGrow: 1, position: 'relative', overflow: 'hidden' }}>
+        <AgentChatSidebar open={isChatOpen} onClose={() => setIsChatOpen(false)} />
         {book?.format === 'epub' && (
           <Box sx={{ height: '100%' }}>
             <ReactReader

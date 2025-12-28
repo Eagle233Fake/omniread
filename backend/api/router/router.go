@@ -1,6 +1,8 @@
 package router
 
 import (
+	"github.com/Eagle233Fake/omniread/backend/api/handler"
+	"github.com/Eagle233Fake/omniread/backend/application/service/auth/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +14,12 @@ func SetupRoutes() *gin.Engine {
 			"message": "pong",
 		})
 	})
+
+	authGroup := r.Group("/auth")
+	{
+		authGroup.POST("/register", handler.Register)
+		authGroup.POST("/login", middleware.LoginRateLimitMiddleware(), handler.Login)
+	}
 
 	return r
 }

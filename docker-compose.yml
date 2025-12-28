@@ -1,0 +1,117 @@
+services:
+  innospark-mongodb:
+    image: mongo:7.0.23-jammy
+    container_name: innospark-mongodb
+    restart: always
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME:
+    #   MONGO_INITDB_ROOT_PASSWORD:
+    ports:
+      - "27017:27017"
+    volumes:
+      - ~/srv/innospark/mongo:/data/db
+
+  innospark-redis:
+    image: redis:8.2-alpine
+    container_name: innospark-redis
+    restart: always
+    environment:
+      REDIS_PASSWORD: 123456
+    ports:
+      - "6379:6379"
+    volumes:
+      - ~/srv/innospark/redis:/data
+
+  psych-mongodb:
+    image: mongo:7.0.23-jammy
+    container_name: psych-mongodb
+    restart: always
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME:
+    #   MONGO_INITDB_ROOT_PASSWORD:
+    ports:
+      - "27016:27017"
+    volumes:
+      - ~/srv/psych/mongo:/data/db
+
+  psych-redis:
+    image: redis:8.2-alpine
+    container_name: psych-redis
+    restart: always
+    environment:
+      REDIS_PASSWORD: 123456
+    ports:
+      - "6378:6379"
+    volumes:
+      - ~/srv/psych/redis:/data
+
+  meowpick-mongodb:
+    image: mongo:7.0.23-jammy
+    container_name: meowpick-mongodb
+    restart: always
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME:
+    #   MONGO_INITDB_ROOT_PASSWORD:
+    ports:
+      - "27015:27017"
+    volumes:
+      - ~/srv/meowpick/mongo:/data/db
+
+  meowpick-redis:
+    image: redis:8.2-alpine
+    container_name: meowpick-redis
+    restart: always
+    environment:
+      REDIS_PASSWORD: 123456
+    ports:
+      - "6377:6379"
+    volumes:
+      - ~/srv/meowpick/redis:/data
+
+  synapse-mysql:
+    image: mysql:8.0
+    container_name: synapse-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: test
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - ~/srv/synapse/mysql:/var/lib/mysql
+
+  synapse-redis:
+    image: redis:8.2-alpine
+    container_name: synapse-redis
+    restart: always
+    environment:
+      REDIS_PASSWORD:
+    command: ["redis-server"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ~/srv/synapse/redis:/data
+
+  omniread-mongodb:
+    image: mongo:7.0.23-jammy
+    container_name: omniread-mongodb
+    restart: always
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME:
+    #   MONGO_INITDB_ROOT_PASSWORD:
+    ports:
+      - "27018:27017"
+    volumes:
+      - ~/srv/omniread/mongo:/data/db
+
+  omniread-redis:
+    image: redis:8.2-alpine
+    container_name: omniread-redis
+    restart: always
+    environment:
+      REDIS_PASSWORD: 123456
+    ports:
+      - "6376:6379"
+    volumes:
+      - ~/srv/omniread/redis:/data

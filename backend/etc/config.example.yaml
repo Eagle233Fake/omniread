@@ -28,4 +28,4 @@ OSS:
   BucketName: "omniread-books"
   UseSSL: false
 Bocha:
-  APIKey: "YOUR_BOCHA_API_KEY"
+  APIKey: "sk-7c58260b147c4226b3dfbd8167104280"

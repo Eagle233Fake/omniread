@@ -3,7 +3,8 @@ package engine
 import (
 	"context"
 	"fmt"
-	"os"
+	"io"
+	"strings"
 
 	"github.com/Eagle233Fake/omniread/backend/infra/config"
 	"github.com/Eagle233Fake/omniread/backend/internal/agent/domain"
@@ -14,6 +15,12 @@ import (
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
 )
+
+// Stream defines the interface for chat stream
+type Stream interface {
+	Recv() (*schema.Message, error)
+	Close()
+}
 
 type AgentExecutor struct {
 	promptBuilder  *PromptBuilder
@@ -37,7 +44,7 @@ func NewAgentExecutor(cfg *config.Config) *AgentExecutor {
 }
 
 // ChatStream 返回一个 Reader 供上层流式读取
-func (e *AgentExecutor) ChatStream(ctx context.Context, agent *domain.Agent, userMessage string) (*schema.StreamReader[*schema.Message], error) {
+func (e *AgentExecutor) ChatStream(ctx context.Context, agent *domain.Agent, userMessage string) (Stream, error) {
 	// 1. 获取历史消息
 	// 假设 sessionID 为 agentID (简单起见，实际应为 用户ID:书籍ID)
 	sessionID := agent.ID
@@ -139,9 +146,50 @@ func (e *AgentExecutor) ChatStream(ctx context.Context, agent *domain.Agent, use
 	go func() {
 		bgCtx := context.Background()
 		_ = e.historyManager.AddMessage(bgCtx, sessionID, schema.UserMessage(userMessage))
-		// 注意：LLM 的回复需要在流式读取完毕后保存，这里暂时无法获取完整的回复内容
-		// 理想做法是在 Service 层消费完 stream 后统一保存，或者使用 Eino 的 Callback
 	}()
 
-	return stream, nil
+	return &historyStreamReader{
+		reader:         stream,
+		historyManager: e.historyManager,
+		sessionID:      sessionID,
+	}, nil
+}
+
+type historyStreamReader struct {
+	reader         *schema.StreamReader[*schema.Message]
+	historyManager *memory.RedisHistoryManager
+	sessionID      string
+	sb             strings.Builder
+}
+
+func (r *historyStreamReader) Recv() (*schema.Message, error) {
+	msg, err := r.reader.Recv()
+	if err == io.EOF {
+		r.saveHistory()
+		return nil, io.EOF
+	}
+	if err != nil {
+		return nil, err
+	}
+	r.sb.WriteString(msg.Content)
+	return msg, nil
+}
+
+func (r *historyStreamReader) Close() {
+	r.reader.Close()
+}
+
+func (r *historyStreamReader) saveHistory() {
+	content := r.sb.String()
+	if content == "" {
+		return
+	}
+
+	msg := &schema.Message{
+		Role:    "assistant",
+		Content: content,
+	}
+
+	ctx := context.Background()
+	_ = r.historyManager.AddMessage(ctx, r.sessionID, msg)
 }

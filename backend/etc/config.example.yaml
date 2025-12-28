@@ -30,6 +30,6 @@ OSS:
 Bocha:
   APIKey: "sk-7c58260b147c4226b3dfbd8167104280"
 Model:
-  BaseURL: "YOUR_MODEL_BASE_URL"
-  APIKey: "YOUR_MODEL_API_KEY"
-  Model: "gpt-3.5-turbo"
+  BaseURL: "https://chat.ecnu.edu.cn/open/api/v1"
+  ApiKey: "sk-f194703e3bdc43178027914e83093beb"
+  ModelName: "ecnu-max"

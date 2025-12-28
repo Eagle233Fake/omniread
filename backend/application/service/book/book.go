@@ -115,7 +115,6 @@ func (s *BookService) UpdateBook(ctx context.Context, userID, bookID string, req
 		uid, _ := primitive.ObjectIDFromHex(userID)
 		book.UploadBy = uid
 	}
-	}
 
 	if req.Title != "" {
 		book.Title = req.Title

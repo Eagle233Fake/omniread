@@ -8,7 +8,6 @@ import (
 	"github.com/Eagle233Fake/omniread/backend/infra/config"
 	"github.com/Eagle233Fake/omniread/backend/internal/agent/domain"
 	"github.com/Eagle233Fake/omniread/backend/internal/agent/engine"
-	"github.com/cloudwego/eino/schema"
 )
 
 type AgentService struct {
@@ -37,7 +36,7 @@ func (s *AgentService) GetAgent(ctx context.Context, id string) (*domain.Agent, 
 }
 
 // ChatStream 建立流式对话
-func (s *AgentService) ChatStream(ctx context.Context, agentID string, message string) (*schema.StreamReader[*schema.Message], error) {
+func (s *AgentService) ChatStream(ctx context.Context, agentID string, message string) (engine.Stream, error) {
 	agent, err := s.repo.FindByID(ctx, agentID)
 	if err != nil {
 		return nil, err

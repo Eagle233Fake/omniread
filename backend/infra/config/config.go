@@ -22,6 +22,14 @@ type WeApp struct {
 	AppSecret string
 }
 
+type OSS struct {
+	Endpoint        string
+	AccessKeyID     string
+	SecretAccessKey string
+	BucketName      string
+	UseSSL          bool
+}
+
 type Config struct {
 	service.ServiceConf
 	ListenOn string
@@ -34,6 +42,7 @@ type Config struct {
 	Cache cache.CacheConf
 	Redis *redis.RedisConf
 	WeApp WeApp
+	OSS   OSS
 }
 
 func NewConfig() (*Config, error) {

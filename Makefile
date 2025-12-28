@@ -39,11 +39,11 @@ synapse-clean:
 	@echo "删除完成"
 
 omniread-run:
-	@echo "初始化 omniread 数据库和缓存服务"
-	docker-compose --project-name omniread -f ./docker-compose.yml up -d omniread-mongodb omniread-redis
+	@echo "初始化 omniread 数据库、缓存和对象存储服务"
+	docker-compose --project-name omniread -f ./docker-compose.yml up -d omniread-mongodb omniread-redis omniread-minio
 	@echo "初始化完成"
 
 omniread-clean:
-	@echo "删除 omniread 数据库和缓存服务"
+	@echo "删除 omniread 数据库、缓存和对象存储服务"
 	docker-compose --project-name omniread -f ./docker-compose.yml down --remove-orphans
 	@echo "删除完成"

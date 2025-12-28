@@ -62,19 +62,57 @@ func PostProcess(c *gin.Context, req, resp any, err error) {
 // 不会覆盖已存在的 data key。
 func makeResponse(resp any) map[string]any {
 	v := reflect.ValueOf(resp)
+	
+	// Handle nil response
+	if resp == nil {
+		return map[string]any{
+			"code": 0,
+			"msg":  "success",
+			"data": nil,
+		}
+	}
+
 	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
-		return nil
+		// If it's not a struct pointer, wrap it in data
+		return map[string]any{
+			"code": 0,
+			"msg":  "success",
+			"data": resp,
+		}
 	}
 	// 构建返回数据
 	v = v.Elem()
 
 	// 构建基础响应（假设 Code/Msg 存在并可取）
+	codeField := v.FieldByName("Code")
+	msgField := v.FieldByName("Msg")
+	
+	code := int64(0)
+	msg := "success"
+	
+	if codeField.IsValid() && codeField.CanInt() {
+		code = codeField.Int()
+	}
+	if msgField.IsValid() && msgField.Kind() == reflect.String {
+		msg = msgField.String()
+	}
+
 	response := map[string]any{
-		"code": v.FieldByName("Code").Int(),
-		"msg":  v.FieldByName("Msg").String(),
+		"code": code,
+		"msg":  msg,
 	}
 
 	data := make(map[string]any)
+
+	// If the struct itself is a DTO that doesn't embed Resp, 
+	// or if we just want to treat all fields as data
+	isWrappedResp := codeField.IsValid() && msgField.IsValid()
+	
+	if !isWrappedResp {
+		// It's a plain DTO, treat whole object as data
+		response["data"] = resp
+		return response
+	}
 
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)

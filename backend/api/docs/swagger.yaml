@@ -1,4 +1,46 @@
 definitions:
+  dto.BookResp:
+    properties:
+      author:
+        type: string
+      cover_url:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      file_url:
+        type: string
+      format:
+        type: string
+      id:
+        type: string
+      size:
+        type: integer
+      title:
+        type: string
+    type: object
+  dto.DailyStat:
+    properties:
+      date:
+        type: string
+      duration:
+        description: seconds
+        type: integer
+    type: object
+  dto.InsightSummaryResp:
+    properties:
+      current_streak:
+        type: integer
+      daily_stats:
+        items:
+          $ref: '#/definitions/dto.DailyStat'
+        type: array
+      total_books_read:
+        type: integer
+      total_reading_time:
+        type: integer
+    type: object
   dto.LoginReq:
     properties:
       password:
@@ -13,6 +55,35 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/model.User'
+    type: object
+  dto.ProgressResp:
+    properties:
+      book_id:
+        type: string
+      current_loc:
+        type: string
+      progress:
+        type: number
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.ReadingSessionReq:
+    properties:
+      book_id:
+        type: string
+      duration:
+        description: seconds
+        type: integer
+      end_time:
+        description: unix timestamp
+        type: integer
+      start_time:
+        description: unix timestamp
+        type: integer
+    required:
+    - book_id
     type: object
   dto.RegisterReq:
     properties:
@@ -40,6 +111,21 @@ definitions:
         type: integer
       msg:
         type: string
+    type: object
+  dto.UpdateProgressReq:
+    properties:
+      book_id:
+        type: string
+      current_loc:
+        type: string
+      progress:
+        description: percentage
+        type: number
+      status:
+        description: reading, finished
+        type: string
+    required:
+    - book_id
     type: object
   model.User:
     properties:
@@ -145,4 +231,136 @@ paths:
       summary: User Registration
       tags:
       - Auth
+  /books:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: limit
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.BookResp'
+            type: array
+      summary: List Books
+      tags:
+      - Book
+  /books/{id}:
+    get:
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.BookResp'
+      summary: Get Book Details
+      tags:
+      - Book
+  /books/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Book file (pdf/epub)
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Book Title
+        in: formData
+        name: title
+        type: string
+      - description: Book Author
+        in: formData
+        name: author
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.BookResp'
+      summary: Upload Book
+      tags:
+      - Book
+  /insight/summary:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.InsightSummaryResp'
+      summary: Get Reading Insight Summary
+      tags:
+      - Insight
+  /reading/progress:
+    get:
+      parameters:
+      - description: Book ID
+        in: query
+        name: book_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProgressResp'
+      summary: Get Reading Progress
+      tags:
+      - Reading
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Progress Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateProgressReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProgressResp'
+      summary: Update Reading Progress
+      tags:
+      - Reading
+  /reading/session:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Session Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReadingSessionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: Record Reading Session
+      tags:
+      - Reading
 swagger: "2.0"

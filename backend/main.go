@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/Eagle233Fake/omniread/backend/api/docs" // Import generated docs
 	"github.com/Eagle233Fake/omniread/backend/api/router"
 	"github.com/Eagle233Fake/omniread/backend/infra/config"
 	"github.com/Eagle233Fake/omniread/backend/provider"

@@ -1,0 +1,148 @@
+definitions:
+  dto.LoginReq:
+    properties:
+      password:
+        type: string
+      username:
+        description: Can be username, email, or phone
+        type: string
+    type: object
+  dto.LoginResp:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/model.User'
+    type: object
+  dto.RegisterReq:
+    properties:
+      avatar:
+        type: string
+      bio:
+        type: string
+      birthdate:
+        description: YYYY-MM-DD
+        type: string
+      email:
+        type: string
+      gender:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.Resp:
+    properties:
+      code:
+        type: integer
+      msg:
+        type: string
+    type: object
+  model.User:
+    properties:
+      avatar:
+        type: string
+      bio:
+        type: string
+      birthdate:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      gender:
+        type: string
+      id:
+        type: string
+      last_login_at:
+        type: string
+      oauth_id:
+        description: Extended fields
+        type: string
+      phone:
+        type: string
+      phone_verified:
+        type: boolean
+      provider:
+        type: string
+      status:
+        description: active, inactive
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with username/email/phone and password
+      parameters:
+      - description: Login Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.LoginResp'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/dto.Resp'
+        "401":
+          description: Authentication failed
+          schema:
+            $ref: '#/definitions/dto.Resp'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: User Login
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with username, password, and optional fields
+      parameters:
+      - description: Registration Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/dto.Resp'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/dto.Resp'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.Resp'
+      summary: User Registration
+      tags:
+      - Auth
+swagger: "2.0"

@@ -13,6 +13,7 @@ import (
 	"github.com/Eagle233Fake/omniread/backend/infra/config"
 	"github.com/Eagle233Fake/omniread/backend/infra/oss"
 	"github.com/Eagle233Fake/omniread/backend/infra/repo"
+	agentservice "github.com/Eagle233Fake/omniread/backend/internal/agent/service"
 	"github.com/google/wire"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -40,6 +41,7 @@ type Provider struct {
 	BookService    *book.BookService
 	ReadingService *reading.ReadingService
 	InsightService *insight.InsightService
+	AgentService   *agentservice.AgentService
 }
 
 var ApplicationSet = wire.NewSet(
@@ -47,12 +49,14 @@ var ApplicationSet = wire.NewSet(
 	book.BookServiceSet,
 	reading.ReadingServiceSet,
 	insight.InsightServiceSet,
+	agentservice.NewAgentService,
 )
 
 var InfraSet = wire.NewSet(
 	config.NewConfig,
 	repo.UserRepoSet,
 	repo.ReadingRepoSet,
+	repo.AgentRepoSet,
 	GetDB,
 	GetRedis,
 	cache.NewAuthCache,

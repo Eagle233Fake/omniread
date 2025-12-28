@@ -15,6 +15,7 @@ import (
 	"github.com/Eagle233Fake/omniread/backend/infra/config"
 	"github.com/Eagle233Fake/omniread/backend/infra/oss"
 	"github.com/Eagle233Fake/omniread/backend/infra/repo"
+	"github.com/Eagle233Fake/omniread/backend/internal/agent/service"
 )
 
 // Injectors from wire.go:
@@ -36,12 +37,15 @@ func NewProvider() (*Provider, error) {
 	readingSessionRepo := repo.NewReadingSessionRepo(database)
 	readingService := reading.NewReadingService(readingProgressRepo, readingSessionRepo)
 	insightService := insight.NewInsightService(readingSessionRepo, readingProgressRepo)
+	agentRepository := repo.NewAgentRepo(database)
+	agentService := service.NewAgentService(agentRepository, configConfig)
 	providerProvider := &Provider{
 		Config:         configConfig,
 		AuthService:    authService,
 		BookService:    bookService,
 		ReadingService: readingService,
 		InsightService: insightService,
+		AgentService:   agentService,
 	}
 	return providerProvider, nil
 }

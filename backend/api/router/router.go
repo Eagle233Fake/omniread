@@ -6,11 +6,8 @@ import (
 	"github.com/Eagle233Fake/omniread/backend/api/handler/book"
 	"github.com/Eagle233Fake/omniread/backend/api/handler/reading"
 	"github.com/Eagle233Fake/omniread/backend/application/service/auth/middleware"
-	"github.com/Eagle233Fake/omniread/backend/infra/config"
-	"github.com/Eagle233Fake/omniread/backend/internal/agent/domain"
-	"github.com/Eagle233Fake/omniread/backend/internal/agent/service"
+	"github.com/Eagle233Fake/omniread/backend/provider"
 	"github.com/gin-gonic/gin"
-	"github.com/zeromicro/go-zero/core/stores/redis"
 )
 
 func SetupRoutes() *gin.Engine {
@@ -67,17 +64,7 @@ func SetupRoutes() *gin.Engine {
 		insightGroup.GET("/summary", reading.GetInsightSummary)
 	}
 
-	// Dependency Injection (Stubbed for now)
-	cfg := config.GetConfig()
-	if cfg == nil {
-		// Fallback for testing without config file
-		cfg = &config.Config{}
-		cfg.Redis = &redis.RedisConf{Host: "localhost:6379", Pass: ""}
-	}
-
-	agentRepo := &domain.StubAgentRepository{}
-	agentSvc := service.NewAgentService(agentRepo, cfg)
-	agentHdl := agent.NewAgentHandler(agentSvc)
+	agentHdl := agent.NewAgentHandler(provider.Get().AgentService)
 
 	apiV1 := r.Group("/api/v1")
 	{

@@ -22,17 +22,16 @@ type WeApp struct {
 	AppSecret string
 }
 
-<<<<<<< HEAD
 type OSS struct {
 	Endpoint        string
 	AccessKeyID     string
 	SecretAccessKey string
 	BucketName      string
 	UseSSL          bool
-=======
+}
+
 type Bocha struct {
 	APIKey string
->>>>>>> f03f0b8 (feat: implement basic agent structure with Eino and add TODOs for search tool)
 }
 
 type Config struct {

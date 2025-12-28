@@ -10,6 +10,7 @@ import (
 	"github.com/Eagle233Fake/omniread/backend/internal/agent/domain"
 	"github.com/Eagle233Fake/omniread/backend/internal/agent/service"
 	"github.com/gin-gonic/gin"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 )
 
 func SetupRoutes() *gin.Engine {
@@ -71,7 +72,7 @@ func SetupRoutes() *gin.Engine {
 	if cfg == nil {
 		// Fallback for testing without config file
 		cfg = &config.Config{}
-		cfg.Redis = &config.RedisConf{Host: "localhost:6379", Pass: ""}
+		cfg.Redis = &redis.RedisConf{Host: "localhost:6379", Pass: ""}
 	}
 
 	agentRepo := &domain.StubAgentRepository{}

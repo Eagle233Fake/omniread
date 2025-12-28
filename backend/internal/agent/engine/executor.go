@@ -86,8 +86,18 @@ func (e *AgentExecutor) ChatStream(ctx context.Context, agent *domain.Agent, use
 		if err != nil {
 			return nil, fmt.Errorf("failed to create tools node: %w", err)
 		}
+		// 提取 ToolInfo 用于绑定到 ChatModel
+		toolInfos := make([]*schema.ToolInfo, 0, len(agentTools))
+		for _, t := range agentTools {
+			info, err := t.Info(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("failed to get tool info: %w", err)
+			}
+			toolInfos = append(toolInfos, info)
+		}
+
 		// 正确绑定工具到 ChatModel
-		if err := chatModel.BindTools(agentTools); err != nil {
+		if err := chatModel.BindTools(toolInfos); err != nil {
 			return nil, fmt.Errorf("failed to bind tools to chat model: %w", err)
 		}
 

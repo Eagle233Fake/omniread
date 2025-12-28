@@ -34,6 +34,12 @@ type Bocha struct {
 	APIKey string
 }
 
+type Model struct {
+	BaseURL string
+	APIKey  string
+	Model   string
+}
+
 type Config struct {
 	service.ServiceConf
 	ListenOn string
@@ -48,6 +54,7 @@ type Config struct {
 	WeApp WeApp
 	OSS   OSS
 	Bocha Bocha
+	Model Model
 }
 
 func NewConfig() (*Config, error) {

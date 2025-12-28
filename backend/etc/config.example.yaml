@@ -29,3 +29,7 @@ OSS:
   UseSSL: false
 Bocha:
   APIKey: "sk-7c58260b147c4226b3dfbd8167104280"
+Model:
+  BaseURL: "YOUR_MODEL_BASE_URL"
+  APIKey: "YOUR_MODEL_API_KEY"
+  Model: "gpt-3.5-turbo"

@@ -65,9 +65,18 @@ func (e *AgentExecutor) ChatStream(ctx context.Context, agent *domain.Agent, use
 	}
 
 	// 4. 初始化 ChatModel
+	modelName := "gpt-3.5-turbo"
+	if e.config.Model.Model != "" {
+		modelName = e.config.Model.Model
+	}
+	if agent.Config.Model != "" {
+		modelName = agent.Config.Model
+	}
+
 	chatModel, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
-		Model:  "gpt-3.5-turbo", // 默认模型，可改为 agent.Config.Model
-		APIKey: os.Getenv("OPENAI_API_KEY"),
+		BaseURL: e.config.Model.BaseURL,
+		Model:   modelName,
+		APIKey:  e.config.Model.APIKey,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to init chat model: %w", err)

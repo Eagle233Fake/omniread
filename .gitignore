@@ -10,6 +10,7 @@ backend/etc/
 
 # Build
 backend/main
+backend/backend.exe
 backend/uploads/
 
 # OS

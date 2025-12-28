@@ -27,3 +27,5 @@ OSS:
   SecretAccessKey: "minioadmin"
   BucketName: "omniread-books"
   UseSSL: false
+Bocha:
+  APIKey: "YOUR_BOCHA_API_KEY"

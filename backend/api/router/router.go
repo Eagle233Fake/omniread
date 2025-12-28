@@ -2,9 +2,13 @@ package router
 
 import (
 	"github.com/Eagle233Fake/omniread/backend/api/handler"
+	"github.com/Eagle233Fake/omniread/backend/api/handler/agent"
 	"github.com/Eagle233Fake/omniread/backend/api/handler/book"
 	"github.com/Eagle233Fake/omniread/backend/api/handler/reading"
 	"github.com/Eagle233Fake/omniread/backend/application/service/auth/middleware"
+	"github.com/Eagle233Fake/omniread/backend/infra/config"
+	"github.com/Eagle233Fake/omniread/backend/internal/agent/domain"
+	"github.com/Eagle233Fake/omniread/backend/internal/agent/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -60,6 +64,27 @@ func SetupRoutes() *gin.Engine {
 	insightGroup := api.Group("/insight")
 	{
 		insightGroup.GET("/summary", reading.GetInsightSummary)
+	}
+
+	// Dependency Injection (Stubbed for now)
+	cfg := config.GetConfig()
+	if cfg == nil {
+		// Fallback for testing without config file
+		cfg = &config.Config{}
+		cfg.Redis = &config.RedisConf{Host: "localhost:6379", Pass: ""}
+	}
+
+	agentRepo := &domain.StubAgentRepository{}
+	agentSvc := service.NewAgentService(agentRepo, cfg)
+	agentHdl := agent.NewAgentHandler(agentSvc)
+
+	apiV1 := r.Group("/api/v1")
+	{
+		agents := apiV1.Group("/agents")
+		{
+			agents.POST("", agentHdl.Create)
+			agents.POST("/chat", agentHdl.Chat)
+		}
 	}
 
 	return r

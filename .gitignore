@@ -1,0 +1,16 @@
+# IDE
+.trae/
+.vscode/
+.idea/
+
+# Config
+backend/etc/
+*.yaml
+!backend/etc/config.example.yaml
+
+# Build
+backend/main
+backend/uploads/
+
+# OS
+.DS_Store

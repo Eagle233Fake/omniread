@@ -6,8 +6,12 @@ import (
 
 	"github.com/Boyuan-IT-Club/go-kit/logs"
 	"github.com/Eagle233Fake/omniread/backend/application/service/auth"
+	"github.com/Eagle233Fake/omniread/backend/application/service/book"
+	"github.com/Eagle233Fake/omniread/backend/application/service/insight"
+	"github.com/Eagle233Fake/omniread/backend/application/service/reading"
 	"github.com/Eagle233Fake/omniread/backend/infra/cache"
 	"github.com/Eagle233Fake/omniread/backend/infra/config"
+	"github.com/Eagle233Fake/omniread/backend/infra/oss"
 	"github.com/Eagle233Fake/omniread/backend/infra/repo"
 	"github.com/google/wire"
 	"github.com/zeromicro/go-zero/core/stores/redis"
@@ -31,20 +35,28 @@ func Get() *Provider {
 
 // Provider 提供Handler依赖的对象
 type Provider struct {
-	Config      *config.Config
-	AuthService *auth.AuthService
+	Config         *config.Config
+	AuthService    *auth.AuthService
+	BookService    *book.BookService
+	ReadingService *reading.ReadingService
+	InsightService *insight.InsightService
 }
 
 var ApplicationSet = wire.NewSet(
 	auth.AuthServiceSet,
+	book.BookServiceSet,
+	reading.ReadingServiceSet,
+	insight.InsightServiceSet,
 )
 
 var InfraSet = wire.NewSet(
 	config.NewConfig,
 	repo.UserRepoSet,
+	repo.ReadingRepoSet,
 	GetDB,
 	GetRedis,
 	cache.NewAuthCache,
+	oss.NewOSSClient,
 )
 
 var AllProvider = wire.NewSet(

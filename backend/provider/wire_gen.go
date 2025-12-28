@@ -8,8 +8,12 @@ package provider
 
 import (
 	"github.com/Eagle233Fake/omniread/backend/application/service/auth"
+	"github.com/Eagle233Fake/omniread/backend/application/service/book"
+	"github.com/Eagle233Fake/omniread/backend/application/service/insight"
+	"github.com/Eagle233Fake/omniread/backend/application/service/reading"
 	"github.com/Eagle233Fake/omniread/backend/infra/cache"
 	"github.com/Eagle233Fake/omniread/backend/infra/config"
+	"github.com/Eagle233Fake/omniread/backend/infra/oss"
 	"github.com/Eagle233Fake/omniread/backend/infra/repo"
 )
 
@@ -25,9 +29,19 @@ func NewProvider() (*Provider, error) {
 	redis := GetRedis(configConfig)
 	authCache := cache.NewAuthCache(redis)
 	authService := auth.NewAuthService(userRepo, authCache)
+	bookRepo := repo.NewBookRepo(database)
+	ossClient := oss.NewOSSClient(configConfig)
+	bookService := book.NewBookService(bookRepo, ossClient)
+	readingProgressRepo := repo.NewReadingProgressRepo(database)
+	readingSessionRepo := repo.NewReadingSessionRepo(database)
+	readingService := reading.NewReadingService(readingProgressRepo, readingSessionRepo)
+	insightService := insight.NewInsightService(readingSessionRepo, readingProgressRepo)
 	providerProvider := &Provider{
-		Config:      configConfig,
-		AuthService: authService,
+		Config:         configConfig,
+		AuthService:    authService,
+		BookService:    bookService,
+		ReadingService: readingService,
+		InsightService: insightService,
 	}
 	return providerProvider, nil
 }

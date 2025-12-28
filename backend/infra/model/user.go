@@ -17,6 +17,10 @@ type User struct {
 	Avatar    string             `bson:"avatar,omitempty" json:"avatar"`
 	Bio       string             `bson:"bio,omitempty" json:"bio"`
 	Status    string             `bson:"status" json:"status"` // active, inactive
+
+	// User Preferences
+	Preferences Preferences `bson:"preferences,omitempty" json:"preferences,omitempty"`
+
 	// Extended fields
 	OAuthID         string     `bson:"oauth_id,omitempty" json:"oauth_id,omitempty"`
 	Provider        string     `bson:"provider,omitempty" json:"provider,omitempty"`
@@ -28,4 +32,9 @@ type User struct {
 	CreatedAt   time.Time  `bson:"createdAt" json:"created_at"`
 	UpdatedAt   time.Time  `bson:"updatedAt" json:"updated_at"`
 	LastLoginAt *time.Time `bson:"lastLoginAt,omitempty" json:"last_login_at"`
+}
+
+type Preferences struct {
+	FontFamily string `bson:"font_family" json:"font_family"`
+	FontSize   int    `bson:"font_size" json:"font_size"`
 }

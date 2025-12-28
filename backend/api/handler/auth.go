@@ -37,6 +37,76 @@ func Register(c *gin.Context) {
 	PostProcess(c, req, resp, nil)
 }
 
+// GetProfile
+// @Summary Get User Profile
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.User
+// @Router /user/profile [get]
+func GetProfile(c *gin.Context) {
+	userID := c.GetString("uid")
+	user, err := provider.Get().AuthService.GetUser(c.Request.Context(), userID)
+	PostProcess(c, nil, user, err)
+}
+
+// UpdateProfile
+// @Summary Update User Profile
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param request body dto.UpdateProfileReq true "Update Request"
+// @Success 200 {object} dto.Resp
+// @Router /user/profile [put]
+func UpdateProfile(c *gin.Context) {
+	userID := c.GetString("uid")
+	var req dto.UpdateProfileReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		PostProcess(c, nil, nil, err)
+		return
+	}
+	err := provider.Get().AuthService.UpdateProfile(c.Request.Context(), userID, &req)
+	PostProcess(c, req, dto.Success(), err)
+}
+
+// ChangePassword
+// @Summary Change User Password
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param request body dto.ChangePasswordReq true "Change Password Request"
+// @Success 200 {object} dto.Resp
+// @Router /user/password [put]
+func ChangePassword(c *gin.Context) {
+	userID := c.GetString("uid")
+	var req dto.ChangePasswordReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		PostProcess(c, nil, nil, err)
+		return
+	}
+	err := provider.Get().AuthService.ChangePassword(c.Request.Context(), userID, &req)
+	PostProcess(c, req, dto.Success(), err)
+}
+
+// UpdatePreferences
+// @Summary Update User Preferences
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param request body dto.UpdatePreferencesReq true "Update Preferences Request"
+// @Success 200 {object} dto.Resp
+// @Router /user/preferences [put]
+func UpdatePreferences(c *gin.Context) {
+	userID := c.GetString("uid")
+	var req dto.UpdatePreferencesReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		PostProcess(c, nil, nil, err)
+		return
+	}
+	err := provider.Get().AuthService.UpdatePreferences(c.Request.Context(), userID, &req)
+	PostProcess(c, req, dto.Success(), err)
+}
+
 // Login handles user authentication
 // @Summary User Login
 // @Description Login with username/email/phone and password

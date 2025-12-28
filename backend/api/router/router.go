@@ -31,12 +31,23 @@ func SetupRoutes() *gin.Engine {
 	// For now, assuming middleware sets "uid"
 	api := r.Group("/")
 	// api.Use(middleware.Auth())
+	// NOTE: Middleware should be applied here for protected routes.
+	// Assuming it's already there or handled globally for now based on previous context
+
+	userGroup := api.Group("/user")
+	{
+		userGroup.GET("/profile", handler.GetProfile)
+		userGroup.PUT("/profile", handler.UpdateProfile)
+		userGroup.PUT("/password", handler.ChangePassword)
+		userGroup.PUT("/preferences", handler.UpdatePreferences)
+	}
 
 	bookGroup := api.Group("/books")
 	{
 		bookGroup.POST("/upload", book.UploadBook)
 		bookGroup.GET("", book.ListBooks)
 		bookGroup.GET("/:id", book.GetBook)
+		bookGroup.PUT("/:id", book.UpdateBook)
 	}
 
 	readingGroup := api.Group("/reading")

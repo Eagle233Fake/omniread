@@ -106,3 +106,16 @@ func (r *UserRepo) UpdateLastLogin(ctx context.Context, id primitive.ObjectID) e
 	})
 	return err
 }
+
+func (r *UserRepo) Update(ctx context.Context, user *model.User) error {
+	filter := bson.M{"_id": user.ID}
+	update := bson.M{
+		"$set": user,
+	}
+	_, err := r.coll.UpdateOne(ctx, filter, update)
+	return err
+}
+
+func (r *UserRepo) FindByID(ctx context.Context, id primitive.ObjectID) (*model.User, error) {
+	return r.FindOne(ctx, bson.M{"_id": id})
+}

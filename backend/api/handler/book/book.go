@@ -53,6 +53,28 @@ func ListBooks(c *gin.Context) {
 	handler.PostProcess(c, nil, resp, err)
 }
 
+// UpdateBook
+// @Summary Update Book Details
+// @Tags Book
+// @Accept json
+// @Produce json
+// @Param id path string true "Book ID"
+// @Param body body dto.UpdateBookReq true "Update Info"
+// @Success 200 {object} dto.Resp
+// @Router /books/{id} [put]
+func UpdateBook(c *gin.Context) {
+	id := c.Param("id")
+	userID := c.GetString("uid")
+	var req dto.UpdateBookReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		handler.PostProcess(c, nil, nil, err)
+		return
+	}
+
+	err := provider.Get().BookService.UpdateBook(c.Request.Context(), userID, id, &req)
+	handler.PostProcess(c, req, dto.Success(), err)
+}
+
 // GetBook
 // @Summary Get Book Details
 // @Tags Book

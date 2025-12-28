@@ -8,6 +8,7 @@ const (
 	ErrUserNotFound     = 102000001
 	ErrUserExist        = 102000002
 	ErrUserCreateFailed = 102000003
+	ErrUserUpdateFailed = 102000004
 )
 
 func init() {
@@ -24,6 +25,11 @@ func init() {
 	code.Register(
 		ErrUserCreateFailed,
 		"failed to create user",
+		code.WithAffectStability(false),
+	)
+	code.Register(
+		ErrUserUpdateFailed,
+		"user update failed",
 		code.WithAffectStability(false),
 	)
 }

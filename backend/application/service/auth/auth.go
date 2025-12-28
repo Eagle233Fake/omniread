@@ -15,6 +15,7 @@ import (
 	"github.com/Eagle233Fake/omniread/backend/infra/repo"
 	"github.com/Eagle233Fake/omniread/backend/types/errno"
 	"github.com/google/wire"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -154,4 +155,110 @@ func (s *AuthService) Login(ctx context.Context, req *dto.LoginReq) (*dto.LoginR
 	_ = s.userRepo.UpdateLastLogin(ctx, user.ID)
 
 	return assembler.UserToLoginResp(user, t), nil
+}
+
+func (s *AuthService) UpdateProfile(ctx context.Context, userID string, req *dto.UpdateProfileReq) error {
+	// Parse user ID
+	uid, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return errorx.New(errno.ParamErrorCode)
+	}
+
+	user, err := s.userRepo.FindByID(ctx, uid)
+	if err != nil || user == nil {
+		return errorx.New(errno.ErrUserNotFound)
+	}
+
+	// Update fields if provided
+	if req.Nickname != "" {
+		user.Username = req.Nickname // Assuming username acts as nickname, or add Nickname field to model
+	}
+	if req.Avatar != "" {
+		user.Avatar = req.Avatar
+	}
+	if req.Bio != "" {
+		user.Bio = req.Bio
+	}
+	if req.Gender != "" {
+		user.Gender = req.Gender
+	}
+	if req.Birthdate != "" {
+		if t, err := time.Parse("2006-01-02", req.Birthdate); err == nil {
+			user.Birthdate = &t
+		}
+	}
+	if req.Phone != "" {
+		user.Phone = req.Phone
+	}
+	if req.Email != "" {
+		user.Email = req.Email
+	}
+	user.UpdatedAt = time.Now()
+
+	if err := s.userRepo.Update(ctx, user); err != nil {
+		return errorx.New(errno.ErrUserUpdateFailed)
+	}
+	return nil
+}
+
+func (s *AuthService) ChangePassword(ctx context.Context, userID string, req *dto.ChangePasswordReq) error {
+	uid, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return errorx.New(errno.ParamErrorCode)
+	}
+
+	user, err := s.userRepo.FindByID(ctx, uid)
+	if err != nil || user == nil {
+		return errorx.New(errno.ErrUserNotFound)
+	}
+
+	// Verify old password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.OldPassword)); err != nil {
+		return errorx.New(errno.ErrAuthFailed)
+	}
+
+	// Hash new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return errorx.New(errno.ErrUserUpdateFailed)
+	}
+
+	user.Password = string(hashedPassword)
+	user.UpdatedAt = time.Now()
+
+	if err := s.userRepo.Update(ctx, user); err != nil {
+		return errorx.New(errno.ErrUserUpdateFailed)
+	}
+	return nil
+}
+
+func (s *AuthService) UpdatePreferences(ctx context.Context, userID string, req *dto.UpdatePreferencesReq) error {
+	uid, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return errorx.New(errno.ParamErrorCode)
+	}
+
+	user, err := s.userRepo.FindByID(ctx, uid)
+	if err != nil || user == nil {
+		return errorx.New(errno.ErrUserNotFound)
+	}
+
+	user.Preferences = model.Preferences{
+		FontFamily: req.FontFamily,
+		FontSize:   req.FontSize,
+	}
+	user.UpdatedAt = time.Now()
+
+	if err := s.userRepo.Update(ctx, user); err != nil {
+		return errorx.New(errno.ErrUserUpdateFailed)
+	}
+	return nil
+}
+
+func (s *AuthService) GetUser(ctx context.Context, userID string) (*model.User, error) {
+	uid, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, errorx.New(errno.ParamErrorCode)
+	}
+	return s.userRepo.FindByID(ctx, uid)
 }

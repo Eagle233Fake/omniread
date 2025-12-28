@@ -93,6 +93,39 @@ func (s *BookService) UploadBook(ctx context.Context, userID string, file *multi
 	}, nil
 }
 
+func (s *BookService) UpdateBook(ctx context.Context, userID, bookID string, req *dto.UpdateBookReq) error {
+	oid, err := primitive.ObjectIDFromHex(bookID)
+	if err != nil {
+		return errorx.New(400)
+	}
+
+	book, err := s.bookRepo.FindByID(ctx, oid)
+	if err != nil {
+		return errorx.New(404)
+	}
+
+	// Permission Check: only owner can update (add admin check later if needed)
+	if book.UploadBy.Hex() != userID {
+		return errorx.New(403, "permission denied")
+	}
+
+	if req.Title != "" {
+		book.Title = req.Title
+	}
+	if req.Author != "" {
+		book.Author = req.Author
+	}
+	if req.Description != "" {
+		book.Description = req.Description
+	}
+	book.UpdatedAt = time.Now()
+
+	if err := s.bookRepo.Update(ctx, book); err != nil {
+		return errorx.New(500)
+	}
+	return nil
+}
+
 func (s *BookService) ListBooks(ctx context.Context, page, limit int) ([]*dto.BookResp, error) {
 	if page < 1 {
 		page = 1

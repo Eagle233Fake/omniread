@@ -2,24 +2,6 @@ package dto
 
 import "time"
 
-type UploadBookReq struct {
-	Title       string `form:"title"`
-	Author      string `form:"author"`
-	Description string `form:"description"`
-}
-
-type BookResp struct {
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	Author      string    `json:"author"`
-	CoverURL    string    `json:"cover_url"`
-	FileURL     string    `json:"file_url"`
-	Format      string    `json:"format"`
-	Size        int64     `json:"size"`
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"created_at"`
-}
-
 type UpdateProgressReq struct {
 	BookID     string  `json:"book_id" binding:"required"`
 	Progress   float64 `json:"progress"` // percentage
@@ -28,10 +10,10 @@ type UpdateProgressReq struct {
 }
 
 type ProgressResp struct {
-	BookID     string  `json:"book_id"`
-	Progress   float64 `json:"progress"`
-	CurrentLoc string  `json:"current_loc"`
-	Status     string  `json:"status"`
+	BookID     string    `json:"book_id"`
+	Progress   float64   `json:"progress"`
+	CurrentLoc string    `json:"current_loc"`
+	Status     string    `json:"status"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }
 

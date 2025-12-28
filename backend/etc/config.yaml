@@ -1,0 +1,20 @@
+Name: omniread-backend
+Log:
+  Mode: console
+  Level: debug
+ListenOn: 0.0.0.0:8080
+Auth:
+  SecretKey: "secret"
+  PublicKey: "public"
+  AccessExpire: 86400
+WeApp:
+  AppID: "appid"
+  AppSecret: "secret"
+Mongo:
+  URL: "mongodb://localhost:27017"
+  DB: "omniread"
+Cache:
+  - Host: "localhost:6379"
+Redis:
+  Host: "localhost:6379"
+  Type: node

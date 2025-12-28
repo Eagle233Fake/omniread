@@ -61,7 +61,14 @@ func (r *BookRepo) List(ctx context.Context, limit int64, offset int64) ([]*mode
 func (r *BookRepo) Update(ctx context.Context, book *model.Book) error {
 	filter := bson.M{"_id": book.ID}
 	update := bson.M{
-		"$set": book,
+		"$set": bson.M{
+			"title":       book.Title,
+			"author":      book.Author,
+			"description": book.Description,
+			"updated_at":  time.Now(),
+			"upload_by":   book.UploadBy,
+			"cover_url":   book.CoverURL,
+		},
 	}
 	_, err := r.coll.UpdateOne(ctx, filter, update)
 	return err

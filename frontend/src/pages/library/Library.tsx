@@ -176,9 +176,13 @@ const Library: React.FC = () => {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={book.cover_url || 'https://via.placeholder.com/300x400?text=No+Cover'}
+                    image={book.cover_url || '/api/uploads/default_cover.svg'}
                     alt={book.title}
                     sx={{ objectFit: 'cover', aspectRatio: '3/4' }}
+                    onError={(e: any) => {
+                      e.target.onerror = null; 
+                      e.target.src = '/api/uploads/default_cover.svg';
+                    }}
                   />
                   <CardContent sx={{ position: 'relative' }}>
                     <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
